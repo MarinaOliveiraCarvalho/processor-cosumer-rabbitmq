@@ -1,0 +1,56 @@
+server:
+  port: 4580
+  #port: ${PORT:0}
+  servlet:
+    context-path: /processor
+spring:
+  application:
+    name: crud-example
+  datasource:
+    url: jdbc:postgresql://localhost:5432/marina?createDatabaseIfNotExist=true&useSSL=false
+    username: postgres
+    password: toor
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        ddl-auto: update
+        jdbc:
+          lob:
+            non_contextual_creation: true
+  mvc:
+    pathmatch:
+      matching-strategy: ANT_PATH_MATCHER
+  rabbitmq:
+    virtualhost: /
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+    thread:
+      min: 1
+      max: 4
+
+
+api:
+  rabbitmq:
+    publishing:
+      add-like:
+        exchange: crud.publishing.add-like.exchange
+        routingkey: #
+        routing: process
+        queue: crud.publishing.add-like.queue
+        max.retries: 2
+        dlq:
+          routing: dlq
+          queue: crud.publishing.add-like.queue.dlq
+          delay: 1000
+        pkl:
+          queue: crud.publishing.add-like.parkinglot
+          routing: parkinglot
+
+integration:
+  crud:
+    v1:
+      host: http://localhost:4545/crud
